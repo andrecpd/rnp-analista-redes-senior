@@ -129,3 +129,49 @@ Use este banco para revisão rápida. Tente responder sem consultar material.
 71-A 72-A 73-A 74-A 75-A 76-A 77-A 78-A 79-A 80-A
 81-A 82-A 83-A 84-A 85-A 86-A 87-A 88-A 89-A 90-A
 91-A 92-A 93-A 94-A 95-A 96-A 97-A 98-A 99-A 100-A
+
+## Como usar o banco
+
+### Rodada 1 — velocidade
+Responda as 100 sem consultar. Marque apenas as que geraram dúvida.
+
+### Rodada 2 — justificativa
+Para cada erro, escreva em uma linha **por que a alternativa correta é correta e por que a sua estava errada**.
+
+### Rodada 3 — foco RNP
+Priorize:
+- subnetting/CIDR/LPM;
+- OSPF states, LSAs, DR/BDR e ExStart;
+- BGP best-path, políticas e next-hop;
+- VLAN/trunk/STP;
+- IPv6/NDP/ICMPv6;
+- MPLS/VRF/RD/RT/MP-BGP;
+- Linux iproute2, sockets, DNS e tcpdump;
+- troubleshooting baseado em evidências.
+
+## Pegadinhas para revisar
+
+1. **/27 = 30 hosts utilizáveis**, não 32.
+2. **Longest Prefix Match** escolhe o prefixo mais específico.
+3. **OSPF protocol 89**; não usa TCP/179.
+4. **OSPF 2-Way pode ser normal** em Ethernet entre DROTHERs.
+5. **OSPF ExStart → MTU** é uma verificação clássica.
+6. **BGP Established não garante prefixo na RIB/FIB.**
+7. **Weight** tem alta precedência na seleção Cisco tradicional.
+8. **RD distingue; RT controla import/export.**
+9. **NDP usa ICMPv6**, não ARP.
+10. Bloquear indiscriminadamente **ICMPv6** pode quebrar Neighbor Discovery e PMTUD.
+11. Um hop lento no traceroute **não é automaticamente a causa**.
+12. CRC/errors apontam primeiro para investigação física/L2.
+13. `LISTEN` no Linux não prova que a aplicação está saudável.
+14. DNS resolvido não prova que TCP/443 funciona.
+15. Em troubleshooting, **evidência vem antes da mudança**.
+
+## Meta de desempenho
+
+| Resultado | Interpretação |
+|---|---|
+| 90–100 | Excelente — revisar apenas pegadinhas |
+| 80–89 | Bom — reforçar pontos de erro |
+| 70–79 | Atenção — revisar fundamentos e cenários |
+| <70 | Fazer nova rodada antes do simulado final |
