@@ -1,34 +1,151 @@
 # Cenários de Troubleshooting — Nível Sênior
 
-## 1 — BGP Established, sem rota
-Verifique sessão, anúncio, address-family, prefix-list, route-map, communities, next-hop e RIB/FIB. Não confunda sessão TCP/BGP ativa com troca efetiva de rotas.
+## 1. BGP Established, mas prefixo não chega
 
-## 2 — OSPF preso em ExStart
-Investigue MTU, network type, timers, autenticação, Router ID e conectividade.
+**Evidências:**
+```text
+show ip bgp summary
+show ip bgp <prefix>
+show ip route <prefix>
+show ip bgp neighbors <IP>
+```
 
-## 3 — VLAN sem acesso
-Fluxo: porta access → VLAN → trunk → STP → SVI/gateway → ARP → DHCP → rota → ACL/firewall → aplicação.
+**Hipóteses:**
+- prefixo não anunciado;
+- address-family inativa;
+- prefix-list;
+- route-map/policy;
+- community;
+- next-hop inacessível;
+- rota recebida mas perdeu best-path;
+- não instalada na RIB/FIB.
 
-## 4 — Backbone saturado
-Colete utilização, erros/discards, top talkers, horários, capacidade, QoS, caminhos alternativos e crescimento. Decida entre otimização, balanceamento, expansão ou mudança arquitetural.
+**Resposta sênior:** não reiniciar a sessão antes de descobrir onde o prefixo desapareceu.
 
-## 5 — Alta latência
-Compare origem, trânsito e destino. Use ping, traceroute/mtr e métricas de interface. Não atribua causa apenas a um hop isolado.
+## 2. OSPF preso em ExStart
 
-## 6 — Perda intermitente
-Investigue físico, congestionamento, policers, QoS, MTU, CPU, assimetria e flaps.
+Verifique:
+1. MTU;
+2. network type;
+3. timers;
+4. autenticação;
+5. Router ID;
+6. conectividade;
+7. ACL/firewall.
 
-## 7 — IPv6 sem comunicação
-Verifique endereços, link-local, NDP, RA/SLAAC, rota IPv6, ICMPv6 e filtros.
+**Clássico:** MTU incompatível.
 
-## 8 — L3VPN MPLS sem comunicação
-Verifique CE-PE, VRF, rotas locais, MP-BGP, RT import/export, LDP/LSP e labels.
+## 3. VLAN sem acesso
 
-## 9 — MAC flapping
-Verifique loops, redundância L2, STP, EtherChannel, cabos e topologia.
+Fluxo:
+`access port → VLAN → trunk → STP → SVI → DHCP/ARP → routing → ACL → serviço`
 
-## 10 — Serviço TCP indisponível
-Separe DNS → reachability IP → TCP → TLS → HTTP/aplicação → autenticação.
+Comandos:
+```text
+show vlan brief
+show interfaces trunk
+show spanning-tree
+show ip interface brief
+show ip arp
+```
 
-## Regra de resposta
-Contexto → sintoma → evidências → hipóteses → testes → causa raiz → ação → validação → prevenção.
+## 4. Backbone saturado
+
+Colete:
+- utilização por interface;
+- input/output drops;
+- erros;
+- top talkers;
+- horário;
+- direção;
+- QoS;
+- caminhos alternativos;
+- crescimento.
+
+Decisões:
+- otimização;
+- balanceamento;
+- QoS;
+- expansão;
+- mudança arquitetural.
+
+## 5. Alta latência
+
+Compare:
+`origem → trânsito → destino`
+
+Não declare "o hop 3 é o problema" somente porque o ICMP respondeu lento. Veja os hops seguintes e o destino.
+
+## 6. Perda intermitente
+
+Investigue:
+- CRC/erros;
+- congestionamento;
+- drops;
+- policer;
+- QoS;
+- MTU;
+- CPU;
+- flaps;
+- assimetria;
+- firewall stateful.
+
+## 7. IPv6 sem comunicação
+
+Verifique:
+1. endereço global/link-local;
+2. prefixo;
+3. NDP;
+4. RA/SLAAC;
+5. rota default;
+6. ICMPv6;
+7. ACL/firewall;
+8. MTU/PMTUD.
+
+## 8. L3VPN MPLS sem comunicação
+
+Verifique:
+`CE-PE → VRF → rota → MP-BGP → RT → next-hop → LDP/LSP → labels → forwarding`
+
+Pegadinha:
+**RD ≠ RT.**
+
+## 9. MAC flapping
+
+Hipóteses:
+- loop L2;
+- EtherChannel inconsistente;
+- cabos/topologia incorreta;
+- STP;
+- equipamento conectado em dois pontos.
+
+Verifique:
+```text
+show mac address-table dynamic
+show spanning-tree
+show etherchannel summary
+```
+
+## 10. TCP indisponível
+
+Separe:
+`DNS → IP → TCP SYN/SYN-ACK → TLS → HTTP → aplicação`
+
+Se houver dúvida, capture:
+```text
+tcpdump -ni any host <IP> and port <PORTA>
+```
+
+## 11. Método de resposta
+
+Para qualquer cenário:
+
+**Contexto → Sintoma → Escopo → Evidências → Hipóteses → Testes → Causa raiz → Correção → Validação → Prevenção.**
+
+## 12. Pegadinha sênior
+
+A resposta mais forte normalmente não é "eu mudaria X".
+
+É:
+
+> "Primeiro eu confirmaria X com Y; se o resultado for Z, sigo para a hipótese seguinte."
