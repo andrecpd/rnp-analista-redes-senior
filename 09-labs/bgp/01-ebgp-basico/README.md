@@ -48,41 +48,27 @@ Os nomes de interface podem variar no appliance. Confirme com `ip -br address` a
 
 Documentação: [FRR BGP User Guide](https://docs.frrouting.org/en/stable-10.2/bgp.html) · [GNS3 Docs](https://docs.gns3.com/) · [EVE-NG](https://www.eve-ng.net/).
 
-## Etapa 1 — Configurar endereços no Linux
+## Etapa 1 — Aplicar configuração FRR e validar interfaces
 
-Em cada nó, ajuste o nome da interface se necessário.
+Os arquivos `R1/frr.conf` e `R2/frr.conf` já incluem endereços das interfaces no formato FRR. **Use esses arquivos como fonte da configuração e não execute também os comandos `ip addr add` para os mesmos endereços**, pois isso tentaria adicionar endereços duplicados.
 
-**R1:**
+1. Faça backup de `/etc/frr/frr.conf` em cada nó.
+2. Copie o arquivo do roteador correspondente para `/etc/frr/frr.conf`.
+3. Aplique a configuração com `sudo vtysh -f /etc/frr/frr.conf`.
+4. Verifique `ip -br addr` e `ip route`. Se os endereços não aparecerem, confirme se os daemons `zebra` e `bgpd` estão habilitados e se o appliance permite configurar interfaces via FRR.
+5. Confirme a conectividade entre os endereços do enlace: de R1, `ping -c 3 10.0.12.2`; de R2, `ping -c 3 10.0.12.1`.
+
+Se preferir configurar endereços diretamente no Linux, remova antes os blocos `interface` dos arquivos FRR e configure os endereços pelo sistema operacional. Endereços configurados via `ip addr add` podem não persistir após reinicialização.
+
+## Etapa 2 — Validar configuração FRR
+
+Depois de aplicar o arquivo correto em cada roteador:
 ```bash
-sudo ip addr add 10.0.12.1/30 dev eth1
-sudo ip link set eth1 up
-sudo ip addr add 192.0.2.1/24 dev lo
-ip -br addr
-ping -c 3 10.0.12.2
-```
-
-**R2:**
-```bash
-sudo ip addr add 10.0.12.2/30 dev eth1
-sudo ip link set eth1 up
-sudo ip addr add 198.51.100.1/24 dev lo
-ip -br addr
-ping -c 3 10.0.12.1
-```
-
-Os comandos `ip addr add` não são necessariamente persistentes após reiniciar. Para o exercício, mantenha os nós ligados ou configure persistência conforme a distribuição.
-
-## Etapa 2 — Aplicar FRR
-
-Os arquivos deste diretório são exemplos de configuração integrada do FRR: [R1/frr.conf](R1/frr.conf) e [R2/frr.conf](R2/frr.conf). Faça backup do arquivo existente antes de substituir `/etc/frr/frr.conf`. Ajuste permissões conforme a instalação e recarregue o serviço FRR.
-
-Exemplo de aplicação, depois de copiar o arquivo correto para cada roteador:
-```bash
-sudo vtysh -f /etc/frr/frr.conf
 sudo vtysh -c 'show running-config'
+sudo systemctl status frr
 ```
 
-Se a instalação usar serviços systemd, valide com `sudo systemctl status frr`. Não reinicie serviços em equipamentos compartilhados ou de produção.
+Os nomes dos serviços e a forma de carregar configuração variam conforme o appliance. Não reinicie serviços em equipamentos compartilhados ou de produção.
 
 ## Etapa 3 — Validar sessão e rotas
 
