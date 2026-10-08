@@ -24,6 +24,7 @@ O objetivo não é apenas fazer o ping funcionar. É saber explicar por que func
 |---|---|---|
 | 01 | OSPF + Troubleshooting | Intermediário |
 | 02 | BGP + Policy | Avançado |
+| BGP-01 | [eBGP básico entre dois ASNs](bgp/01-ebgp-basico/README.md) | Avançado |
 | 03 | Switching + VLAN + STP + EtherChannel | Intermediário |
 | 04 | IPv4/IPv6 + ICMPv6/NDP | Intermediário |
 | 05 | MPLS + VRF + L3VPN | Avançado |
@@ -32,6 +33,10 @@ O objetivo não é apenas fazer o ping funcionar. É saber explicar por que func
 | 08 | Monitoramento + SNMP/Syslog | Intermediário |
 | 09 | ISP/RNP integrado | Avançado |
 | 10 | Simulado prático de 2 horas | Prova |
+
+## Trilha BGP detalhada
+
+A trilha progressiva de BGP, com configurações FRR, troubleshooting e gabarito do primeiro laboratório, está em [09-labs/bgp/README.md](bgp/README.md).
 
 ## Ordem recomendada
 
